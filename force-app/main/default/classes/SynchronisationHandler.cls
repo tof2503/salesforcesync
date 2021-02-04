@@ -34,9 +34,38 @@ public with sharing class SynchronisationHandler {
         return sync;
     }
 
-    /*public static void doSync(List<SObject> lSource, List<SObject> ldest){
+    public static void doSync(List<SObject> lSource, List<SObject> ldest){
+        String sourceObjName = lSource.get(0).getSObjectType().getDescribe().getName();
+        String destObjName = ldest.get(0).getSObjectType().getDescribe().getName();
+        
+        List<SObject> lObjToUpdate = new List<SObject>();
+        Map<String,List<SObject>> mKeyLObject = new Map<String,List<SObject>>();
 
-    }*/
+        SyncConfig syncConf = getSyncConfig(sourceObjName, destObjName);
+
+        for(SObject obj :ldest){
+            String keyValue = String.valueOf(obj.get(syncConf.keyObjDest));
+
+            List<SObject> lObjects = mKeyLObject.containsKey(keyValue) ? mKeyLObject.get(keyValue) : new List<SObject>();
+            lObjects.add(obj);
+            mKeyLObject.put(keyValue, lObjects);
+        }
+
+        for(SObject obj :lSource){
+            String keyValue = String.valueOf(obj.get(syncConf.keyObjSource));
+            List<SObject> ldestObj = mKeyLObject.get(keyValue);
+
+            for(SObject destObj :ldestObj){
+                for(SyncConfigField currentField :syncConf.fields){
+                    destObj.put(currentField.fieldDest,obj.get(currentField.fieldSource));
+                }
+
+                lObjToUpdate.add(destObj);
+            }
+        }
+
+        if(lObjToUpdate.size() > 0) update lObjToUpdate;
+    }
 
 
     public class SyncConfig{
