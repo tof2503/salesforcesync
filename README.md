@@ -1,6 +1,6 @@
 # Salesforce DX Project: Next Steps
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+Apex Class and Custom MetaData for synchronize custom field between SObject
 
 ## How Do You Plan to Deploy Your Changes?
 
